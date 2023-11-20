@@ -28,4 +28,10 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::post('registro', [RegisterController::class, 'create']);
 Route::get('get_datauser', [UserController::class, 'dataUser']);
-Route::get('get_ingredientes', [IngredientController::class, 'dataIngredient']);
+Route::get('get_ingredientes', [IngredientController::class, 'prueba']);
+
+Route::post('users', [UserController::class, 'store']);
+Route::get('users', [UserController::class, 'index']);
+Route::get('users/{id}', [UserController::class, 'show']);
+Route::put('users/{id}', [UserController::class, 'update']);
+Route::delete('users/{id}', [UserController::class, 'destroy']);

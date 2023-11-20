@@ -16,99 +16,67 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
-    {
-        $users = User::paginate();
 
-        return view('user.index', compact('users'))
-            ->with('i', (request()->input('page', 1) - 1) * $users->perPage());
-    }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        $user = new User();
-        return view('user.create', compact('user'));
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        request()->validate(User::$rules);
-
-        $user = User::create($request->all());
-
-        return redirect()->route('users.index')
-            ->with('success', 'User created successfully.');
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        $user = User::find($id);
-
-        return view('user.show', compact('user'));
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        $user = User::find($id);
-
-        return view('user.edit', compact('user'));
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request $request
-     * @param  User $user
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, User $user)
-    {
-        request()->validate(User::$rules);
-
-        $user->update($request->all());
-
-        return redirect()->route('users.index')
-            ->with('success', 'User updated successfully');
-    }
-
-    /**
-     * @param int $id
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Exception
-     */
-    public function destroy($id)
-    {
-        $user = User::find($id)->delete();
-
-        return redirect()->route('users.index')
-            ->with('success', 'User deleted successfully');
-    }
     public function dataUser()
     {
         $user = User::all();
         return response()->json($user);
+    }
+
+    public function index()
+    {
+        // Obtener todos los usuarios
+        $users = User::all();
+        return response()->json($users);
+    }
+
+    public function show($id)
+    {
+        // Obtener un usuario por ID
+        $user = User::findOrFail($id);
+        return response()->json($user);
+    }
+
+    public function store(Request $request)
+    {
+        // Validar la solicitud
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string',
+            // Agrega más campos si es necesario
+        ]);
+
+        // Crear un nuevo usuario
+        $user = User::create($request->all());
+
+        return response()->json($user, 201);
+    }
+
+    public function update(Request $request, $id)
+    {
+        // Validar la solicitud
+        $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $id,
+            'password' => 'required|string',
+            // Agrega más campos si es necesario
+        ]);
+
+        // Actualizar el usuario
+        $user = User::findOrFail($id);
+        $user->update($request->all());
+
+        return response()->json($user, 200);
+    }
+
+    public function destroy($id)
+    {
+        // Eliminar el usuario
+        $user = User::findOrFail($id);
+        $user->delete();
+
+        return response()->json(null, 204);
     }
 }
